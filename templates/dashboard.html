@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Subscription Tracker</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>Client Subscription Tracker</h1>
+
+            <p>
+                Internal Subscription Monitoring Dashboard
+            </p>
+
+        </div>
+
+        <div class="header-right">
+
+            <span class="badge-api">
+
+                FastAPI
+
+            </span>
+
+            <span class="badge-db">
+
+                PostgreSQL
+
+            </span>
+
+        </div>
+
+    </header>
+
+    <!-- ================= KPI CARDS ================= -->
+
+    <section class="cards">
+
+        <div class="card card-blue">
+
+            <h2>{{ customers|length }}</h2>
+
+            <span>Total Customers</span>
+
+        </div>
+
+        <div class="card card-green">
+
+            <h2>
+
+                {{ customers
+                |selectattr("status","equalto","active")
+                |list
+                |length }}
+
+            </h2>
+
+            <span>Active Plans</span>
+
+        </div>
+
+        <div class="card card-orange">
+
+            <h2>
+
+                {{ customers
+                |selectattr("usage_percent","ge",80)
+                |selectattr("usage_percent","lt",100)
+                |list
+                |length }}
+
+            </h2>
+
+            <span>Near Limit</span>
+
+        </div>
+
+        <div class="card card-red">
+
+            <h2>
+
+                {{ customers
+                |selectattr("usage_percent","ge",100)
+                |list
+                |length }}
+
+            </h2>
+
+            <span>Over Limit</span>
+
+        </div>
+
+    </section>
+
+    <!-- ================= TABLE ================= -->
+
+    <section class="table-section">
+
+        <div class="table-title">
+
+            <div>
+
+                <h2>Customer Subscriptions</h2>
+
+                <p>
+                    Monitor customer plans and usage
+                </p>
+
+            </div>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Customer</th>
+
+                <th>Email</th>
+
+                <th>Plan</th>
+
+                <th>Status</th>
+
+                <th>Usage</th>
+
+                <th>Action</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for c in customers %}
+
+            <tr>
+
+                <td>
+
+                    <strong>
+
+                        {{ c.customer_name }}
+
+                    </strong>
+
+                </td>
+
+                <td>
+
+                    {{ c.email }}
+
+                </td>
+
+                <td>
+
+                    {% if c.plan=="enterprise" %}
+
+                    <span class="plan enterprise">
+
+                        Enterprise
+
+                    </span>
+
+                    {% elif c.plan=="pro" %}
+
+                    <span class="plan pro">
+
+                        Pro
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="plan free">
+
+                        Free
+
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if c.status=="active" %}
+
+                    <span class="status active">
+
+                        Active
+
+                    </span>
+
+                    {% elif c.status=="cancelled" %}
+
+                    <span class="status cancelled">
+
+                        Cancelled
+
+                    </span>
+
+                    {% else %}
+
+                    <span class="status due">
+
+                        Past Due
+
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <div class="progress">
+
+                        {% if c.usage_percent < 70 %}
+
+                        <div class="progress-bar green"
+
+                             style="width: {{ c.usage_percent }}%;">
+
+                            {{ c.usage_percent }}%
+
+                        </div>
+
+                        {% elif c.usage_percent < 90 %}
+
+                        <div class="progress-bar yellow"
+
+                             style="width: {{ c.usage_percent }}%;">
+
+                            {{ c.usage_percent }}%
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="progress-bar red"
+
+                             style="width: {{ c.usage_percent }}%;">
+
+                            {{ c.usage_percent }}%
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </td>
+
+                <td>
+
+                    <a href="/customer/{{ c.customer_id }}"
+
+                       class="view-btn">
+
+                        View
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+            
