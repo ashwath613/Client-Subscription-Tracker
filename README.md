@@ -151,11 +151,6 @@ pip install -r requirements.txt
 
 ---
 
-### 6. Configure the environment
-
-Create a `.env` file and add your PostgreSQL connection string.
-
----
 
 ### 7. Run the application
 
